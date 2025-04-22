@@ -19,29 +19,69 @@ df = df.dropna(subset=['mass_g'])
 #endregion
 
 #region SETUP SIDEBAR
+#add sidebar title
 st.sidebar.header("Filter Options")
 
+#sidebar subheader
+st.sidebar.subheader("Year Filter")
+#add year range slider with min and max years
 minYear = int(df['year'].min())
 maxYear = int(df['year'].max())
 yearRange = st.sidebar.slider("Year Range", minYear, maxYear, (minYear, maxYear))
 
+#adding mass as input instead of slider as mass goes up to 60million grams so makes slider hard to be precise
+#sidebar subheader
+st.sidebar.subheader("Mass Filter")
 minMass = int(df['mass_g'].min())
 maxMass = int(df['mass_g'].max())
-MassRange = st.sidebar.slider("Mass Range", minMass, maxMass, (minMass, maxMass))
+st.sidebar.write("Select a mass range (grams):")
+min_mass_input = st.sidebar.number_input("Min mass", min_value=minMass, max_value=maxMass, value=minMass, step=100)
+max_mass_input = st.sidebar.number_input("Max mass", min_value=minMass, max_value=maxMass, value=maxMass, step=100)
+
+#sidebar subheader for reclass
+st.sidebar.subheader("Meteor Class Filters")
+
+#Get a list of all classes that are unique and no NAN
+Classes = df['recclass'].dropna().unique()
+
+# Add radio buttons to control which class filter applies
+filter_mode = st.sidebar.radio(
+    "Class Filter Mode",
+    options=["All", "Manual Input"],
+    index=0,  # default to "All"
+    key="class_mode" # need this to track what option is selected so we can clear the input box when switching to all classes , otherwise it errors 
+)
+
+# Clear the input box when all tickbox is selected
+if filter_mode == "All" and st.session_state.get("class_input", "") != "":
+    st.session_state["class_input"] = ""
+    st.rerun()
+
+# If using Manual Input, show dropdown and recomendations of input
+if filter_mode == "Manual Input":
+    selected_class = st.sidebar.selectbox(
+        "Start typing to search for a class",
+        options=sorted(Classes),
+        index=None,
+        placeholder="Type to search...",
+          
+    )
+else:
+    selected_class = None
+
 
 # Filter df based on year
 df = df[df['year'].between(yearRange[0], yearRange[1])]
 #Filter df based on mass
-df = df[df['mass_g'].between(MassRange[0], MassRange[1])]
-
+df = df[df['mass_g'].between(min_mass_input, max_mass_input)]
+#filter df based on reclass
+if selected_class:
+    df = df[df['recclass'] == selected_class]
 #endregion
 
 #region SETUP MAP
-
 # Drop rows with missing coordinates 
 df = df.dropna(subset=['reclong', 'reclat','GeoLocation'])
-
-
 # Create Pydeck scatterplot for map
 layer = pdk.Layer(
     "ScatterplotLayer",
@@ -62,7 +102,7 @@ view_state = pdk.ViewState(
 
 # Tooltips on map when hovering mouse over
 tooltip = {
-    "html": "<b>Latitude:</b> {reclat} <br/><b>Longitude:</b> {reclong} <br/><b>Name:</b> {name} <br/><b>Year of impact:</b> {year} <br/><b>mass (g):</b> {mass_g}"
+    "html": "<b>Latitude:</b> {reclat} <br/><b>Longitude:</b> {reclong} <br/><b>Name:</b> {name} <br/><b>Year of impact:</b> {year} <br/><b>mass (g):</b> {mass_g} <br/><b>Class (g):</b> {recclass}"
 }
 
 # Show map

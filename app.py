@@ -71,6 +71,7 @@ else:
 
 
 # Filter df based on year
+
 df = df[df['year'].between(yearRange[0], yearRange[1])]
 #Filter df based on mass
 df = df[df['mass_g'].between(min_mass_input, max_mass_input)]
@@ -107,5 +108,31 @@ tooltip = {
 
 # Show map
 st.pydeck_chart(pdk.Deck(layers=[layer], initial_view_state=view_state, tooltip=tooltip))
+
+#endregion
+
+#region SETUP KPIS 
+
+#add dashboard header
+st.subheader("Key Statistics")
+
+#create 4 columns , 1 for each kpi
+kpi1,kpi2,kpi3,kpi4 = st.columns(4)
+
+#create metric for total meteors and display on column kpi1
+kpi1.metric("Total Meteors",len(df))
+
+#calculate average mass of meteors
+avgMass = df['mass_g'].mean()
+#create metric for average mass and rounded to whole number and adding a comma , as the mass in grams is way too large to display neatly
+kpi2.metric("Average Mass in grams",f"{avgMass:,.0f}")
+
+#create metric for Maximum mass
+maxMass = df['mass_g'].max()
+kpi3.metric("Maximum Mass in grams",f"{maxMass:,.0f}")
+
+#create metric for minumum mass
+minMass = df['mass_g'].min()
+kpi4.metric("Minimum Mass in grams",f"{minMass:,.5f}")
 
 #endregion

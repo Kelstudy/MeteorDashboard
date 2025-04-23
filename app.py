@@ -6,7 +6,7 @@ import pydeck as pdk
 
 
 #region LOAD DATASET
-df = pd.read_csv(r"D:\GitMeteor\Meteorite_Landings.csv")
+df = pd.read_csv("Meteorite_Landings.csv")
 df.rename(columns={'mass (g)': 'mass_g'}, inplace=True)  # move this here so it's available to sidebar and map
 #endregion
 

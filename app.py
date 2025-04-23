@@ -3,7 +3,6 @@
 import streamlit as st
 import pandas as pd
 import pydeck as pdk
-import matplotlib.pyplot as plt
 
 
 #region LOAD DATASET

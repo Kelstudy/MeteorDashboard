@@ -6,8 +6,11 @@ import pydeck as pdk
 
 
 #region LOAD DATASET
+original_df = pd.read_csv("Meteorite_Landings.csv") # this is for key insights as the df version will be updated by filters so need this variable to refernce the unfiltered dataset
+original_df.rename(columns={'mass (g)': 'mass_g'}, inplace=True)  # move this here so it's available to sidebar and map
 df = pd.read_csv("Meteorite_Landings.csv")
 df.rename(columns={'mass (g)': 'mass_g'}, inplace=True)  # move this here so it's available to sidebar and map
+
 #endregion
 
 #region CLEAN AND FORMAT DATA
@@ -15,6 +18,11 @@ df = df.dropna(subset=['year'])
 df = df[df['year'] <= pd.Timestamp.now().year]  # remove dates in the future
 df['mass_g'] = pd.to_numeric(df['mass_g'], errors='coerce')
 df = df.dropna(subset=['mass_g'])
+
+original_df = original_df.dropna(subset=['year'])
+original_df = original_df[original_df['year'] <= pd.Timestamp.now().year]  # remove dates in the future
+original_df['mass_g'] = pd.to_numeric(original_df['mass_g'], errors='coerce')
+original_df = original_df.dropna(subset=['mass_g'])
 #endregion
 
 #region SETUP SIDEBAR
@@ -191,6 +199,69 @@ elif page == "Data Tables":
 elif page == "Key Insights":
     #region SETUP KEY INSIGHTS PAGE
     st.title("Key Insights")
+    st.write("Here are some of the key findings from the original ,unfiltered Meteorite Landings dataset:")
+    st.write("Note that these insights are for the entire dataset and therefore will not change based on the sidebar filters")
 
+     # Calculate stats
+    commonClass = original_df['recclass'].value_counts().idxmax()
+    maxMass = original_df['mass_g'].max()
+    heaviestMeteor = original_df.loc[original_df['mass_g'].idxmax(), 'name']
+    oldestMeteor = original_df.loc[original_df['year'].idxmin(), 'name']
+    oldestMeteorYear = int(original_df['year'].min())
+    averageMass = original_df["mass_g"].mean()
+    totalMeteors = len(original_df)
+    uniqueClasses = original_df["recclass"].nunique()  # have to use nunique insead of unique , so we get a number , not a list or each unique class
+    percentLocation = (original_df[["reclat","reclong"]].notnull().all(axis=1).mean()*100)
+
+
+    # Display key metrics
+    kpi1, kpi2, kpi3= st.columns(3)
+    kpi1.metric("Heaviest Meteor", f"{heaviestMeteor}")
+    kpi2.metric("Average mass(g)", f"{averageMass:,.2f}")
+    kpi3.metric("Maximum Mass (g)", f"{maxMass:,.0f}")
+    st.markdown("""
+    **Observations**
+                
+    While the Hoba meteorite stands out as a huge outlier due to being the largest intact meteorite ,most meteorites are far smaller. 
+                
+    The dataset shows an average mass of just over **13 kilograms**, revealing that the average meteorite is nothing like Hoba.
+                
+    Hoba's massive mass pulls the average much higher, hiding the fact that the majority of meteorites are relatively small or weigh little. 
+    This shows how rare massive meteorites are compared to everyday meteorite falls.
+                
+                """)
+    
+
+    kpi4,kpi5,kpi6= st.columns(3)
+    kpi4.metric("Most Common Class", commonClass)
+    kpi5.metric("Oldest Meteor Year",oldestMeteorYear)
+    kpi6.metric("Oldest Meteor",oldestMeteor)
+    st.markdown("""
+    **Observations**
+                
+    The quantity of the **L6 meteorite class** reveals that most meteorites that reach Earth and are recovered, come from a common type of rock from space.
+    
+    Records of meteorite landings also stretch back over a thousand years, with the earliest recorded being in the year **860** , this was the **Nogata** meteorite.
+                
+    This suggests a long history of human fascination with meteorites, even before modern science understood them.   
+                
+                """)
+
+    kpi7,kpi8,kpi9= st.columns(3)
+    kpi7.metric("Total Meteors",totalMeteors)
+    kpi8.metric("Unique Class Types",uniqueClasses)
+    kpi9.metric("Percent of Meteors with location data", f"{percentLocation:.0f}%")
+
+    st.markdown("""
+    **Observations:**
+                
+    There are **45,309** meteorites recorded in the dataset,  and they show a huge variety , with **459** unique classes.
+                
+    This shows that meteorites come from all over the solar system, not just a common location, and they all have different materials and stories behind them.
+                
+    On top of this, about **84%** of them have proper location data, meaning they were able to be located after landing. This means we have a good understanding of how to triangulate the landing points of meteorites 
+                
+                """)
+    
 
     #endregion

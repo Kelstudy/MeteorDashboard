@@ -22,7 +22,7 @@ df = df.dropna(subset=['mass_g'])
 #Setup navigation bar to change pages - added pages as overview page was getting cramped
 page = st.sidebar.selectbox(
     "Navigate to:",
-    ["Overview", "Charts", "Data Tables"]
+    ["Overview", "Charts", "Data Tables","Key Insights"]
 )
 
 #add sidebar title
@@ -172,6 +172,8 @@ elif page == "Charts":
 
 elif page == "Data Tables":
     
+    #region CREATE DATA TABLES
+
     #add heaviest meteor table
     st.subheader("Top 5 Heaviest Meteorites")
     top_5H = df.sort_values(by='mass_g', ascending=False).head(5)
@@ -183,3 +185,12 @@ elif page == "Data Tables":
     top_classes = df['recclass'].value_counts().head(5)
     top_classes.columns = ['Class', 'Count']
     st.table(top_classes)
+
+    #endregion
+
+elif page == "Key Insights":
+    #region SETUP KEY INSIGHTS PAGE
+    st.title("Key Insights")
+
+
+    #endregion

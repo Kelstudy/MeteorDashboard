@@ -175,6 +175,7 @@ elif page == "Charts":
     mass_by_class = df.groupby('recclass')['mass_g'].mean().sort_values(ascending=False).head(10)
     mass_by_class.index = mass_by_class.index.astype(str)
     st.bar_chart(mass_by_class)
+   
     
     #endregion
 
@@ -194,6 +195,15 @@ elif page == "Data Tables":
     top_classes.columns = ['Class', 'Count']
     st.table(top_classes)
 
+     #create newest meteor table
+    st.subheader("Top 10 Newest Meteorites")
+    newest_5= df.sort_values(by='year', ascending=False).head(5)
+    newest_5['year'] = newest_5['year'].astype(int).astype(str) #convert year string to remove commas but convert to int first otherwise get trailing 0s like 1920.0
+    st.table(newest_5[['name', 'year', 'mass_g', 'recclass']])
+    #create top classes by average mass table 
+    st.subheader("Top 10 Heaviest Meteorite Classes (by Average Mass)")
+    mass_by_class = df.groupby('recclass')['mass_g'].mean().sort_values(ascending=False).head(10)
+    st.table(mass_by_class)
     #endregion
 
 elif page == "Key Insights":

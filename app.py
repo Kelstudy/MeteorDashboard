@@ -37,11 +37,11 @@ page = st.sidebar.selectbox(
 st.sidebar.header("Filter Options")
 
 #sidebar subheader
-st.sidebar.subheader("Year Filter")
+st.sidebar.subheader("Discovery Year Filter")
 #add year range slider with min and max years
 minYear = int(df['year'].min())
 maxYear = int(df['year'].max())
-yearRange = st.sidebar.slider("Year Range", minYear, maxYear, (minYear, maxYear))
+yearRange = st.sidebar.slider("Discovery Year Range", minYear, maxYear, (minYear, maxYear))
 
 #adding mass as input instead of slider as mass goes up to 60million grams so makes slider hard to be precise
 #sidebar subheader
@@ -120,7 +120,7 @@ if page == "Overview":
 
     # Tooltips on map when hovering mouse over
     tooltip = {
-        "html": "<b>Latitude:</b> {reclat} <br/><b>Longitude:</b> {reclong} <br/><b>Name:</b> {name} <br/><b>Year of impact:</b> {year} <br/><b>mass (g):</b> {mass_g} <br/><b>Class (g):</b> {recclass}"
+        "html": "<b>Latitude:</b> {reclat} <br/><b>Longitude:</b> {reclong} <br/><b>Name:</b> {name} <br/><b>Year of discovery:</b> {year} <br/><b>mass (g):</b> {mass_g} <br/><b>Class (g):</b> {recclass}"
     }
 
     # Show map
@@ -165,7 +165,7 @@ elif page == "Charts":
     st.bar_chart(topClasses)
 
     #Create average mass by year line chart
-    st.subheader("Average Mass by Year")
+    st.subheader("Average Mass by Discovery Year")
     st.write("You can zoom in or out for a better view")
     avg_mass_by_year = df.groupby(df['year'].astype(int))['mass_g'].mean()
     avg_mass_by_year.index = avg_mass_by_year.index.astype(str)
@@ -196,7 +196,7 @@ elif page == "Data Tables":
     st.table(top_classes)
 
      #create newest meteor table
-    st.subheader("Top 10 Newest Meteorites")
+    st.subheader("Top 10 Most Recently Discovered Meteorites")
     newest_5= df.sort_values(by='year', ascending=False).head(5)
     newest_5['year'] = newest_5['year'].astype(int).astype(str) #convert year string to remove commas but convert to int first otherwise get trailing 0s like 1920.0
     st.table(newest_5[['name', 'year', 'mass_g', 'recclass']])
@@ -244,14 +244,14 @@ elif page == "Key Insights":
 
     kpi4,kpi5,kpi6= st.columns(3)
     kpi4.metric("Most Common Class", commonClass)
-    kpi5.metric("Oldest Meteor Year",oldestMeteorYear)
-    kpi6.metric("Oldest Meteor",oldestMeteor)
+    kpi5.metric("Oldest Meteor Discovery Year",oldestMeteorYear)
+    kpi6.metric("First Meteor Discovered",oldestMeteor)
     st.markdown("""
     **Observations**
                 
     The quantity of the **L6 meteorite class** reveals that most meteorites that reach Earth and are recovered, come from a common type of rock from space.
     
-    Records of meteorite landings also stretch back over a thousand years, with the earliest recorded being in the year **860** , this was the **Nogata** meteorite.
+    Records of meteorite discoverys also stretch back over a thousand years, with the earliest recorded being in the year **860** , this was the **Nogata** meteorite.
                 
     This suggests a long history of human fascination with meteorites, even before modern science understood them.   
                 
